@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1200, user-scalable=yes">
+    <title>التقييم الجغرافي لمترو الإسكندرية الجديد</title>
+    <style>
+        /* التنسيقات العامة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            min-width: 1200px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* رأس الصفحة - تم تصغيره */
+        header {
+            background: linear-gradient(135deg, #1a3a8f 0%, #2c5aa0 100%);
+            color: white;
+            padding: 1.2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        /* القائمة الرئيسية - تم تحسينها */
+        .main-menu {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .main-menu.scrolled {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .menu-list {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .menu-list li {
+            position: relative;
+        }
+        
+        .menu-list a {
+            display: block;
+            padding: 0.8rem 1.2rem;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-list a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(26, 58, 143, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .menu-list a:hover::before {
+            left: 100%;
+        }
+        
+        .menu-list a:hover {
+            background-color: #f0f5ff;
+            color: #1a3a8f;
+            border-bottom: 3px solid #1a3a8f;
+        }
+        
+        .menu-list a.active {
+            background-color: #f0f5ff;
+            color: #1a3a8f;
+            border-bottom: 3px solid #1a3a8f;
+            font-weight: 600;
+        }
+        
+        /* المحتوى الرئيسي */
+        .content-section {
+            padding: 2.5rem 0;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #1a3a8f;
+            font-size: 1.8rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #1a3a8f, #2c5aa0);
+            border-radius: 2px;
+        }
+        
+        .map-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .placeholder-map {
+            width: 100%;
+            height: 350px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.2rem;
+        }
+        
+        /* الخريطة التفاعلية */
+        .interactive-map {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* قسم فريق العمل */
+        .team-section {
+            background-color: #f8f9fa;
+            padding: 2.5rem 0;
+            position: relative;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .team-member {
+            background-color: white;
+            padding: 1.2rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .member-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1a3a8f;
+        }
+        
+        .member-role {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* تذييل الصفحة - تم تصغيره */
+        footer {
+            background-color: #1a3a8f;
+            color: white;
+            text-align: center;
+            padding: 1.2rem 0;
+            margin-top: 1.5rem;
+        }
+        
+        .footer-info {
+            margin-bottom: 0.8rem;
+        }
+        
+        .university-logo {
+            max-width: 150px;
+            margin: 0 auto 0.8rem;
+            display: block;
+        }
+        
+        /* التنسيقات الجديدة للصورة والجدول */
+        .price-content {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .price-image-container {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .price-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .price-table-container {
+            flex: 1;
+            min-width: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 8px;
+            padding: 0.8rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .price-table th {
+            background-color: #1a3a8f;
+            color: white;
+            padding: 0.6rem;
+            text-align: right;
+            position: sticky;
+            top: 0;
+        }
+        
+        .price-table td {
+            padding: 0.6rem;
+            border-bottom: 1px solid #e9ecef;
+            text-align: right;
+        }
+        
+        .price-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .price-table tr:hover {
+            background-color: #e9ecef;
+        }
+        
+        .change-positive {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .change-negative {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        /* إضافة جديدة: نص الإشراف */
+        .supervisors-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .supervisor-text {
+            color: #1a3a8f;
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-align: center;
+            padding: 0.5rem 1rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        /* زر الإعجاب الجديد */
+        .like-container {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: white;
+            padding: 8px 12px;
+            border-radius: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .like-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .like-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+        
+        .like-button:hover {
+            background-color: rgba(255, 0, 0, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .like-button.liked {
+            animation: pulse 0.5s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .like-count {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1a3a8f;
+            min-width: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- رأس الصفحة - تم تصغيره -->
+    <header>
+        <div class="container">
+            <h1>التقييم الجغرافي لمترو الإسكندرية الجديد</h1>
+            <p>مشروع التخرج الخرائطي لطلبة برنامج الجيوماتكس_ كلية الآداب _جامعة الإسكندرية 2025</p>
+        </div>
+    </header>
+    
+    <!-- القائمة الرئيسية -->
+    <nav class="main-menu">
+        <div class="container">
+            <ul class="menu-list">
+                <li><a href="#" data-section="home" class="active">الرئيسية</a></li>
+                <li><a href="#" data-section="price-change">التغير في أسعار الأراضي</a></li>
+                <li><a href="#" data-section="stations">المحطات الأكثر خدمات</a></li>
+                <li><a href="#" data-section="archaeological">المناطق الأثرية</a></li>
+                <li><a href="#" data-section="interactive-archaeological">خريطة تفاعلية للمناطق الأثرية</a></li>
+                <li><a href="#" data-section="access-analysis">تحليل مسافات الوصول</a></li>
+                <li><a href="#" data-section="service-area">Service Area Analysis</a></li>
+                <li><a href="#" data-section="facilities-distribution">التوزيع المكاني للمرافق العامة</a></li>
+                <li><a href="#" data-section="traffic-impact">تأثير المترو على المرور</a></li>
+                <!-- القائمتان الجديدتان -->
+                <li><a href="#" data-section="health-facilities">أقرب منشأة صحية</a></li>
+                <li><a href="#" data-section="interactive-health">خريطة تفاعلية للمنشآت الصحية</a></li>
+                <li><a href="#" data-section="team">اسماء طلبة المشروع</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- المحتوى الرئيسي -->
+    <main>
+        <!-- قسم الرئيسية -->
+        <section id="home" class="content-section active">
+            <div class="container">
+                <h2 class="section-title">التقييم الجغرافي لمترو الإسكندرية الجديد</h2>
+                <div class="map-container">
+                    <iframe src="https://alraaesea.vercel.app/#14/31.2803/30.0102" class="interactive-map" 
+                            title="الخريطة التفاعلية لمترو الإسكندرية الجديد"></iframe>
+                </div>
+                <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+                    <p>يهدف هذا المشروع إلى دراسة التقييم الجغرافي لمترو الإسكندرية الجديد وتأثيره على المنطقة المحيطة به.</p>
+                    <p>يمكنك استعراض نتائج الدراسة من خلال القوائم الموجودة في الأعلى.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- قسم التغير في أسعار الأراضي -->
+        <section id="price-change" class="content-section">
+            <div class="container">
+                <h2 class="section-title">التغير في أسعار الأراضي قبل وبعد تركيب المترو</h2>
+                
+                <div class="price-content">
+                    <div class="price-image-container">
+                        <img src="https://i.postimg.cc/d0Yh11SM/Layout-final.jpg" 
+                             alt="خريطة توضح التغير في أسعار الأراضي" class="price-image">
+                    </div>
+                    
+                    <div class="price-table-container">
+                        <table class="price-table">
+                            <thead>
+                                <tr>
+                                    <th>المحطة</th>
+                                    <th>سعر 2015</th>
+                                    <th>سعر 2025</th>
+                                    <th>التغير (ج.م)</th>
+                                    <th>التغير (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Abo Qir</td>
+                                    <td>4,067</td>
+                                    <td>16,000</td>
+                                    <td class="change-positive">11,933</td>
+                                    <td class="change-positive">293.41%</td>
+                                </tr>
+                                <tr>
+                                    <td>El Mamoraa</td>
+                                    <td>3,401</td>
+                                    <td>40,000</td>
+                                    <td class="change-positive">36,599</td>
+                                    <td class="change-positive">1076.12%</td>
+                                </tr>
+                                <tr>
+                                    <td>Toson</td>
+                                    <td>2,963</td>
+                                    <td>15,000</td>
+                                    <td class="change-positive">12,037</td>
+                                    <td class="change-positive">406.24%</td>
+                                </tr>
+                                <tr>
+                                    <td>El Montazah</td>
+                                    <td>3,544</td>
+                                    <td>41,000</td>
+                                    <td class="change-positive">37,456</td>
+                                    <td class="change-positive">1056.88%</td>
+                                </tr>
+                                <tr>
+                                    <td>El Eslah</td>
+                                    <td>4,554</td>
+                                    <td>18,400</td>
+                                    <td class="change-positive">13,846</td>
+                                    <td class="change-positive">304.04%</td>
+                                </tr>
+                                <tr>
+                                    <td>El Mondra</td>
+                                    <td>2,568</td>
+                                    <td>20,000</td>
+                                    <td class="change-positive">17,432</td>
+                                    <td class="change-positive">678.82%</td>
+                                </tr>
+                                <tr>
+                                    <td>El Asafra</td>
+                                    <td>2,438</td>
+                                    <td>19,000</td>
+                                    <td class="change-positive">16,562</td>
+                                    <td class="change-positive">679.33%</td>
+                                </tr>
+                                <tr>
+                                    <td>sidi bishr</td>
+                                    <td>2,500</td>
+                                    <td>22,000</td>
+                                    <td class="change-positive">19,500</td>
+                                    <td class="change-positive">780.00%</td>
+                                </tr>
+                                <tr>
+                                    <td>Miami</td>
+                                    <td>3,381</td>
+                                    <td>29,000</td>
+                                    <td class="change-positive">25,619</td>
+                                    <td class="change-positive">757.73%</td>
+                                </tr>
+                                <tr>
+                                    <td>victoria</td>
+                                    <td>3,507</td>
+                                    <td>22,000</td>
+                                    <td class="change-positive">18,493</td>
+                                    <td class="change-positive">527.32%</td>
+                                </tr>
+                                <tr>
+                                    <td>Ghobrial</td>
+                                    <td>3,188</td>
+                                    <td>19,000</td>
+                                    <td class="change-positive">15,812</td>
+                                    <td class="change-positive">495.98%</td>
+                                </tr>
+                                <tr>
+                                    <td>mohamed naguib</td>
+                                    <td>4,506</td>
+                                    <td>35,000</td>
+                                    <td class="change-positive">30,494</td>
+                                    <td class="change-positive">676.74%</td>
+                                </tr>
+                                <tr>
+                                    <td>El Souq</td>
+                                    <td>4,283</td>
+                                    <td>20,000</td>
+                                    <td class="change-positive">15,717</td>
+                                    <td class="change-positive">366.96%</td>
+                                </tr>
+                                <tr>
+                                    <td>El Zahria</td>
+                                    <td>2,689</td>
+                                    <td>18,000</td>
+                                    <td class="change-positive">15,311</td>
+                                    <td class="change-positive">569.39%</td>
+                                </tr>
+                                <tr>
+                                    <td>kafr abdo</td>
+                                    <td>3,696</td>
+                                    <td>49,000</td>
+                                    <td class="change-positive">45,304</td>
+                                    <td class="change-positive">1225.76%</td>
+                                </tr>
+                                <tr>
+                                    <td>Sidi Gabr</td>
+                                    <td>3,475</td>
+                                    <td>40,000</td>
+                                    <td class="change-positive">36,525</td>
+                                    <td class="change-positive">1051.08%</td>
+                                </tr>
+                                <tr>
+                                    <td>El Hadra</td>
+                                    <td>2,841</td>
+                                    <td>29,000</td>
+                                    <td class="change-positive">26,159</td>
+                                    <td class="change-positive">920.77%</td>
+                                </tr>
+                                <tr>
+                                    <td>Sporting</td>
+                                    <td>2,762</td>
+                                    <td>40,000</td>
+                                    <td class="change-positive">37,238</td>
+                                    <td class="change-positive">1348.23%</td>
+                                </tr>
+                                <tr>
+                                    <td>Misr Station</td>
+                                    <td>3,500</td>
+                                    <td>40,000</td>
+                                    <td class="change-positive">36,500</td>
+                                    <td class="change-positive">1042.86%</td>
+                                </tr>
+                                <tr>
+                                    <td>Bab Shark</td>
+                                    <td>3,643</td>
+                                    <td>38,000</td>
+                                    <td class="change-positive">34,357</td>
+                                    <td class="change-positive">943.10%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <p>هذه الخريطة توضح التغير في أسعار الأراضي في المناطق المحيطة بمحطات مترو الإسكندرية الجديد.</p>
+                    <p>يمكنك رؤية المناطق التي شهدت ارتفاعاً في الأسعار بعد إنشاء المترو.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- قسم المحطات الأكثر خدمات - تم تحديث الخريطة التفاعلية -->
+        <section id="stations" class="content-section">
+            <div class="container">
+                <h2 class="section-title">المحطات الأكثر خدمات عن الأخرى</h2>
+                <div class="map-container">
+                    <iframe src="https://5-ashen-one.vercel.app/#14/31.2666/29.9997" class="interactive-map" 
+                            title="الخريطة التفاعلية لمحطات مترو الإسكندرية الأكثر خدمات"></iframe>
+                </div>
+                <div style="text-align: center;">
+                    <p>هذه الخريطة التفاعلية توضح المحطات التي تقدم أكبر عدد من الخدمات للمسافرين.</p>
+                    <p>يمكنك رؤية توزيع الخدمات المختلفة في محطات مترو الإسكندرية والتفاعل مع الخريطة.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- قسم المناطق الأثرية - تم تحديثه -->
+        <section id="archaeological" class="content-section">
+            <div class="container">
+                <h2 class="section-title">المناطق الأثرية في الإسكندرية</h2>
+                <div class="map-container">
+                    <img src="https://c.top4top.io/p_36202vwa31.jpg" 
+                         alt="خريطة توضح المناطق الأثرية في الإسكندرية" 
+                         class="price-image" 
+                         style="max-height: 600px; object-fit: contain;">
+                </div>
+                <div style="text-align: center;">
+                    <p>هذه الخريطة توضح توزيع المناطق الأثرية في مدينة الإسكندرية.</p>
+                    <p>يمكنك رؤية المواقع التاريخية والأثرية المهمة في المدينة وكيفية ارتباطها بمشروع مترو الإسكندرية الجديد.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- قسم خريطة تفاعلية للمناطق الأثرية - القسم الجديد -->
+        <section id="interactive-archaeological" class="content-section">
+            <div class="container">
+                <h2 class="section-title">خريطة تفاعلية للمناطق الأثرية</h2>
+                <div class="map-container">
+                    <iframe src="https://end-1-six.vercel.app/#11/31.1932/29.8756" class="interactive-map" 
+                            title="الخريطة التفاعلية للمناطق الأثرية في الإسكندرية"></iframe>
+                </div>
+                <div style="text-align: center;">
+                    <p>هذه الخريطة التفاعلية تهدف إلى تسهيل وصول السائحين إلى الأماكن الأثرية باستخدام مترو الإسكندرية الجديد.</p>
+                    <p>يمكنك التفاعل مع الخريطة لتحديد أقصر الطرق للوصول إلى المواقع الأثرية باستخدام شبكة المترو.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- قسم تحليل مسافات الوصول -->
+        <section id="access-analysis" class="content-section">
+            <div class="container">
+                <h2 class="section-title">تحليل مسافات الوصول إلى محطات مترو الإسكندرية</h2>
+                <div class="map-container">
+                    <img src="https://i.postimg.cc/xCDKcPCc/Whats-App-Image-thlyl-msafat-alwswl-2025-11-23-at-23-36-13-971f9233.jpg" 
+                         alt="خريطة تحليل مسافات الوصول إلى محطات مترو الإسكندرية" 
+                         class="price-image" 
+                         style="max-height: 600px; object-fit: contain;">
+                </div>
+                <div style="text-align: center;">
+                    <p>هذه الخريطة توضح تحليل مسافات الوصول إلى محطات مترو الإسكندرية.</p>
+                    <p>يمكنك رؤية مناطق التغطية والمسافات التي يحتاجها السكان للوصول إلى أقرب محطة مترو.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- قسم Service Area Analysis - القسم الجديد -->
+        <section id="service-area" class="content-section">
+            <div class="container">
+                <h2 class="section-title">Service Area Analysis</h2>
+                <div class="map-container">
+                    <img src="https://res.cloudinary.com/dhlxcif1m/image/upload/v1764196132/qmm4i3ocp57zcm6shhib.jpg" 
+                         alt="خريطة Service Area Analysis لمترو الإسكندرية" 
+                         class="price-image" 
+                         style="max-height: 600px; object-fit: contain;">
+                </div>
+                <div style="text-align: center;">
+                    <p>هذه الخريطة توضح تحليل منطقة الخدمة لمحطات مترو الإسكندرية الجديد.</p>
+                    <p>يهدف هذا التحليل إلى تحديد مناطق التغطية والخدمة المتاحة حول كل محطة مترو.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- قسم التوزيع المكاني للمرافق العامة - تم تحديثه -->
+        <section id="facilities-distribution" class="content-section">
+            <div class="container">
+                <h2 class="section-title">التوزيع المكاني للمرافق العامة بالقرب من مترو الإسكندرية</h2>
+                <div class="map-container">
+                    <img src="https://res.cloudinary.com/dhlxcif1m/image/upload/v1764012108/f1ks9ihqu0hvexedtsyk.jpg" 
+                         alt="خريطة توضح التوزيع المكاني للمرافق العامة بالقرب من محطات مترو الإسكندرية" 
+                         class="price-image" 
+                         style="max-height: 600px; object-fit: contain;">
+                </div>
+                <div style="text-align: center;">
+                    <p>هذه الخريطة توضح التوزيع المكاني للمرافق العامة بالقرب من محطات مترو الإسكندرية الجديد.</p>
+                    <p>تهدف هذه الدراسة إلى تحليل مدى توفر المرافق العامة (مثل المدارس، المستشفيات، الحدائق، الخدمات الحكومية) في المناطق المحيطة بمحطات المترو.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- قسم تأثير المترو على المرور - تم تحديثه بإضافة الصورة الجديدة -->
+        <section id="traffic-impact" class="content-section">
+            <div class="container">
+                <h2 class="section-title">تأثير المترو على المرور</h2>
+                <div class="map-container">
+                    <img src="https://res.cloudinary.com/dhlxcif1m/image/upload/v1764012932/ns73pmmvrqvu2cpzckfn.jpg" 
+                         alt="خريطة توضح تأثير المترو على المرور" 
+                         class="price-image" 
+                         style="max-height: 600px; object-fit: contain;">
+                </div>
+                <div style="text-align: center;">
+                    <p>هذه الخريطة توضح الوضع للمرور بعد إنشاء المترو والوضع الحالي للمرور قبل تركيب المترو.</p>
+                    <p>تهدف هذه الدراسة إلى فهم مدى تأثير المترو على المرور وحل أزمات الازدحام المرورية في مدينة الإسكندرية.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- القسم الجديد: أقرب منشأة صحية -->
+        <section id="health-facilities" class="content-section">
+            <div class="container">
+                <h2 class="section-title">أقرب منشأة صحية</h2>
+                <div class="map-container">
+                    <img src="https://j.top4top.io/p_3619q6w611.jpg" 
+                         alt="خريطة توضح أقرب منشأة صحية لمحطات مترو الإسكندرية" 
+                         class="price-image" 
+                         style="max-height: 600px; object-fit: contain;">
+                </div>
+                <div style="text-align: center;">
+                    <p>هذه الخريطة توضح أقرب منشأة صحية لكل محطة من محطات مترو الإسكندرية الجديد.</p>
+                    <p>تهدف هذه الدراسة إلى تحديد المسافات والطرق المثلى للوصول إلى الخدمات الصحية من محطات المترو.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- القسم الجديد: خريطة تفاعلية للمنشآت الصحية -->
+        <section id="interactive-health" class="content-section">
+            <div class="container">
+                <h2 class="section-title">خريطة تفاعلية للمنشآت الصحية</h2>
+                <div class="map-container">
+                    <iframe src="https://hospetal.vercel.app/#14/31.2645/29.9891" class="interactive-map" 
+                            title="الخريطة التفاعلية للمنشآت الصحية في الإسكندرية"></iframe>
+                </div>
+                <div style="text-align: center;">
+                    <p>هذه الخريطة التفاعلية تهدف إلى تسهيل الوصول إلى المنشآت الصحية باستخدام مترو الإسكندرية الجديد.</p>
+                    <p>يمكنك التفاعل مع الخريطة لتحديد أقصر الطرق للوصول إلى المستشفيات والمراكز الصحية باستخدام شبكة المترو.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- قسم فريق العمل - تم التعديل حسب الطلب -->
+        <section id="team" class="content-section team-section">
+            <div class="container">
+                <!-- زر الإعجاب الجديد -->
+                <div class="like-container">
+                    <button id="likeButton" class="like-button">❤</button>
+                    <span id="likeCount" class="like-count">0</span>
+                </div>
+                
+                <!-- التعديل الجديد: الإشراف ورئيس القسم بجانب بعض مع توسيط العنوان -->
+                <div class="supervisors-container">
+                    <div class="supervisor-text">تحت إشراف د/ محمود كامل</div>
+                    <h2 class="section-title">اسماء طلبة المشروع</h2>
+                    <div class="supervisor-text">رئيس القسم د/ محمد راشد</div>
+                </div>
+                
+                <div class="team-grid">
+                    <!-- الأسماء ستضاف بواسطة JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- تذييل الصفحة - تم تصغيره -->
+    <footer>
+        <div class="container">
+            <div class="footer-info">
+                <p>مشروع التخرج الخرائطي - برنامج الجيوماتكس</p>
+                <p>كلية الآداب - جامعة الإسكندرية</p>
+                <p>2025</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // بيانات فريق العمل مع الأسماء المقدمة
+        const teamMembers = [
+            { name: "محمد رجب عبدالرازق إبراهيم", role: "طالب" },
+            { name: "محمد احمد محمد السيد", role: "طالب" },
+            { name: "مختار ياسر مختار احمد", role: "طالب" },
+            { name: "محمد حلمي إبراهيم امين", role: "طالب" },
+            { name: "يس تامر السيد إبراهيم", role: "طالب" },
+            { name: "مازن اشرف محمد غازي", role: "طالب" },
+            { name: "محمد ياسر محمد رشاد إبراهيم", role: "طالب" },
+            { name: "مازن حسن محمد بشير", role: "طالب" },
+            { name: "عبدالله السيد محمد ناصر", role: "طالب" },
+            { name: "محمد عنتر جابر عنتر", role: "طالب" },
+            { name: "مارتينا مرقص شفيق لاظيم", role: "طالب" },
+            { name: "كيرية لطيف فخري حليم", role: "طالب" },
+            { name: "كريمة جابر مراد عطية", role: "طالب" },
+            { name: "يوستينا عماد عدلي لطفي", role: "طالب" },
+            { name: "ناردين مجدي عبده نصار", role: "طالب" }
+        ];
+        
+        // إضافة أسماء الطلاب إلى قسم فريق العمل
+        const teamGrid = document.querySelector('.team-grid');
+        teamMembers.forEach(member => {
+            const memberElement = document.createElement('div');
+            memberElement.className = 'team-member';
+            memberElement.innerHTML = `
+                <div class="member-name">${member.name}</div>
+                <div class="member-role">${member.role}</div>
+            `;
+            teamGrid.appendChild(memberElement);
+        });
+        
+        // زر الإعجاب
+        const likeButton = document.getElementById('likeButton');
+        const likeCount = document.getElementById('likeCount');
+        
+        // تحميل عدد الإعجابات من localStorage
+        let count = localStorage.getItem('likeCount_team') || 0;
+        likeCount.textContent = count;
+        
+        // عند النقر على الزر
+        likeButton.addEventListener('click', function() {
+            count++;
+            likeCount.textContent = count;
+            localStorage.setItem('likeCount_team', count);
+            
+            // إضافة تأثير النبض
+            this.classList.add('liked');
+            setTimeout(() => {
+                this.classList.remove('liked');
+            }, 500);
+        });
+        
+        // التحكم في عرض الأقسام
+        document.querySelectorAll('.menu-list a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // تحديث القائمة النشطة
+                document.querySelectorAll('.menu-list a').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // إخفاء جميع الأقسام
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // إظهار القسم المطلوب
+                const targetSection = this.getAttribute('data-section');
+                document.getElementById(targetSection).classList.add('active');
+                
+                // التمرير إلى أعفل الصفحة عند تغيير القسم
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                
+                // إعادة تحميل الخريطة عند فتح قسم المحطات (اختياري)
+                if (targetSection === 'stations') {
+                    const iframe = document.querySelector('#stations .interactive-map');
+                    iframe.src = iframe.src; // إعادة تحميل الخريطة
+                }
+                
+                // إعادة تحميل الخريطة عند فتح القسم الرئيسي
+                if (targetSection === 'home') {
+                    const iframe = document.querySelector('#home .interactive-map');
+                    iframe.src = iframe.src; // إعادة تحميل الخريطة
+                }
+                
+                // إعادة تحميل الخريطة عند فتح القسم الجديد
+                if (targetSection === 'interactive-archaeological') {
+                    const iframe = document.querySelector('#interactive-archaeological .interactive-map');
+                    iframe.src = iframe.src; // إعادة تحميل الخريطة
+                }
+                
+                // إعادة تحميل الخريطة عند فتح القسم الجديد للمنشآت الصحية
+                if (targetSection === 'interactive-health') {
+                    const iframe = document.querySelector('#interactive-health .interactive-map');
+                    iframe.src = iframe.src; // إعادة تحميل الخريطة
+                }
+            });
+        });
+        
+        // تأثير التمرير على القائمة
+        window.addEventListener('scroll', function() {
+            const menu = document.querySelector('.main-menu');
+            if (window.scrollY > 100) {
+                menu.classList.add('scrolled');
+            } else {
+                menu.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
